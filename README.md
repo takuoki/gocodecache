@@ -95,4 +95,42 @@ CODES:
 
 ### PostgreSQL
 
-It will be implemented soon...
+```go
+datasource := cache.PostgresSource(db, "codes", [cache.MaxKeyLength]string{"key1", "key2"}, "value")
+```
+
+| key1             | key2 | value                 |
+| :--------------- | :--- | :-------------------- |
+| account_type     | 1    | Anonymous account     |
+| account_type     | 2    | General account       |
+| account_type     | 3    | Administrator account |
+| visibility_level | 1    | Private               |
+| visibility_level | 2    | Public                |
+
+### Internationalization (I18n)
+
+I18n can be supported by adding language codes to the keys.
+
+```yaml
+# ./sample/codes_lang.yaml
+VERSION: 0.1.0
+
+CODES:
+  account_type:
+    1:
+      en-US: Anonymous account
+      ja-JP: 匿名アカウント
+    2:
+      en-US: General account
+      ja-JP: 一般アカウント
+    3:
+      en-US: Administrator account
+      ja-JP: 管理者アカウント
+  visibility_level:
+    1:
+      en-US: Private
+      ja-JP: 非公開
+    2:
+      en-US: Public
+      ja-JP: 公開
+```
