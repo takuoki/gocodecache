@@ -9,13 +9,28 @@ import (
 	cache "github.com/takuoki/gocodecache"
 )
 
-var data = map[[cache.MaxKeyLength]string]string{
-	{"account_type", "1"}:     "Anonymous account",
-	{"account_type", "2"}:     "General account",
-	{"account_type", "3"}:     "Administrator account",
-	{"visibility_level", "1"}: "Private",
-	{"visibility_level", "2"}: "Public",
-}
+var (
+	data = map[[cache.MaxKeyLength]string]string{
+		{"account_type", "1"}:     "Anonymous account",
+		{"account_type", "2"}:     "General account",
+		{"account_type", "3"}:     "Administrator account",
+		{"visibility_level", "1"}: "Private",
+		{"visibility_level", "2"}: "Public",
+	}
+
+	dataLang = map[[cache.MaxKeyLength]string]string{
+		{"account_type", "1", "en-US"}:     "Anonymous account",
+		{"account_type", "1", "ja-JP"}:     "匿名アカウント",
+		{"account_type", "2", "en-US"}:     "General account",
+		{"account_type", "2", "ja-JP"}:     "一般アカウント",
+		{"account_type", "3", "en-US"}:     "Administrator account",
+		{"account_type", "3", "ja-JP"}:     "管理者アカウント",
+		{"visibility_level", "1", "en-US"}: "Private",
+		{"visibility_level", "1", "ja-JP"}: "非公開",
+		{"visibility_level", "2", "en-US"}: "Public",
+		{"visibility_level", "2", "ja-JP"}: "公開",
+	}
+)
 
 func TestCache(t *testing.T) {
 

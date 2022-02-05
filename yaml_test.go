@@ -65,18 +65,7 @@ CODES:
       en-US: Public
       ja-JP: 公開
 `,
-			want: map[[cache.MaxKeyLength]string]string{
-				{"account_type", "1", "en-US"}:     "Anonymous account",
-				{"account_type", "1", "ja-JP"}:     "匿名アカウント",
-				{"account_type", "2", "en-US"}:     "General account",
-				{"account_type", "2", "ja-JP"}:     "一般アカウント",
-				{"account_type", "3", "en-US"}:     "Administrator account",
-				{"account_type", "3", "ja-JP"}:     "管理者アカウント",
-				{"visibility_level", "1", "en-US"}: "Private",
-				{"visibility_level", "1", "ja-JP"}: "非公開",
-				{"visibility_level", "2", "en-US"}: "Public",
-				{"visibility_level", "2", "ja-JP"}: "公開",
-			},
+			want: dataLang,
 		},
 		"failure: invalid yaml": {
 			keyLength: 1,
