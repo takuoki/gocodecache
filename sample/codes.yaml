@@ -1,0 +1,10 @@
+VERSION: 0.1.0
+
+CODES:
+  account_type:
+    1: Anonymous account
+    2: General account
+    3: Administrator account
+  visibility_level:
+    1: Private
+    2: Public
