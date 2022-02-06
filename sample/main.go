@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	_ "github.com/lib/pq"
 	cache "github.com/takuoki/gocodecache"
 )
 
@@ -19,13 +22,17 @@ const (
 func main() {
 	ctx := context.Background()
 
-	db, err := cache.ConnectPostgres(
-		"localhost",
-		"5432",
-		"root",
-		"root",
+	db, err := sql.Open(
 		"postgres",
-		"disable",
+		fmt.Sprintf(
+			"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+			"localhost",
+			"5432",
+			"root",
+			"root",
+			"postgres",
+			"disable",
+		),
 	)
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
@@ -43,14 +50,14 @@ func main() {
 	}
 
 	c1, err := cache.New(ctx,
-		cache.PostgresSource(db, "codes", [cache.MaxKeyLength]string{"key1", "key2"}, "value"), 2)
+		cache.RdbSource(db, "codes", [cache.MaxKeyLength]string{"key1", "key2"}, "value"), 2)
 	if err != nil {
 		log.Fatalf("failed to create codes cache: %v", err)
 	}
 	go reload(ctx, c1)
 
 	c2, err := cache.New(ctx,
-		cache.PostgresSource(db, "codes_lang", [cache.MaxKeyLength]string{"key1", "key2", "lang"}, "value"), 3)
+		cache.RdbSource(db, "codes_lang", [cache.MaxKeyLength]string{"key1", "key2", "lang"}, "value"), 3)
 	if err != nil {
 		log.Fatalf("failed to create codes_lang cache: %v", err)
 	}

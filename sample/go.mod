@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/labstack/echo/v4 v4.6.3
 	github.com/lib/pq v1.10.4
-	github.com/takuoki/gocodecache v0.0.0-20220205160132-8a6ddd9c3f83
+	github.com/takuoki/gocodecache v0.0.0-20220206034910-08a049ce9477
 )
 
 require (
