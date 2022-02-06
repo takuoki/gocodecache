@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	sqlPingRetryLimit    = 30
-	sqlPingRetryInterval = 1 * time.Second
+	dbPingRetryLimit    = 30
+	dbPingRetryInterval = 1 * time.Second
 )
 
 func TestPostgres(t *testing.T) {
@@ -52,13 +52,13 @@ func TestPostgres(t *testing.T) {
 	defer db.Close()
 
 	for i := 0; ; i++ {
-		if i >= sqlPingRetryLimit {
+		if i >= dbPingRetryLimit {
 			t.Fatalf("failed to ping (retryCount=%d): %v", i, err)
 		}
 		if err = db.Ping(); err == nil {
 			break
 		}
-		time.Sleep(sqlPingRetryInterval)
+		time.Sleep(dbPingRetryInterval)
 	}
 
 	for name, tc := range testcases {

@@ -37,7 +37,6 @@ package main
 
 import (
   "context"
-  "fmt"
 
   cache "github.com/takuoki/gocodecache"
 )
@@ -99,6 +98,8 @@ CODES:
 datasource := cache.PostgresSource(db, "codes", [cache.MaxKeyLength]string{"key1", "key2"}, "value")
 ```
 
+table: codes
+
 | key1             | key2 | value                 |
 | :--------------- | :--- | :-------------------- |
 | account_type     | 1    | Anonymous account     |
@@ -106,6 +107,8 @@ datasource := cache.PostgresSource(db, "codes", [cache.MaxKeyLength]string{"key1
 | account_type     | 3    | Administrator account |
 | visibility_level | 1    | Private               |
 | visibility_level | 2    | Public                |
+
+## Tips
 
 ### Internationalization (I18n)
 
@@ -133,4 +136,50 @@ CODES:
     2:
       en-US: Public
       ja-JP: 公開
+```
+
+### Automatic reload
+
+By implementing the reloading process in goroutine, automatic reloading can be achieved. ([sample](sample/main.go))
+
+```go
+package main
+
+import (
+  "context"
+  "time"
+
+  cache "github.com/takuoki/gocodecache"
+)
+
+const reloadInterval = 1 * time.Hour
+
+func main() {
+
+  // ...
+
+  c, err := cache.New(ctx, datasource, 2)
+  if err != nil {
+    // handle error
+  }
+  go reload(ctx, c)
+
+  // ...
+
+}
+
+func reload(ctx context.Context, c *cache.Cache) {
+  for {
+    select {
+    case <-ctx.Done():
+      return
+    default:
+    }
+
+    time.Sleep(reloadInterval)
+    if err := c.Reload(ctx); err != nil {
+      // handle error
+    }
+  }
+}
 ```
