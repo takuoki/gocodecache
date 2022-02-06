@@ -6,29 +6,19 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
-	_ "github.com/lib/pq"
 )
 
-type postgresSource struct {
+type rdbSource struct {
 	db              *sql.DB
 	tableName       string
 	keyColumnNames  [MaxKeyLength]string
 	valueColumnName string
 }
 
-func ConnectPostgres(host, port, user, password, dbname, sslmode string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", host, port, user, password, dbname, sslmode))
-	if err != nil {
-		return nil, fmt.Errorf("failed to open database: %w", err)
-	}
-	return db, nil
-}
-
-func PostgresSource(db *sql.DB, tableName string,
+func RdbSource(db *sql.DB, tableName string,
 	keyColumnNames [MaxKeyLength]string, valueColumnName string,
 ) Datasource {
-	return &postgresSource{
+	return &rdbSource{
 		db:              db,
 		tableName:       tableName,
 		keyColumnNames:  keyColumnNames,
@@ -36,7 +26,7 @@ func PostgresSource(db *sql.DB, tableName string,
 	}
 }
 
-func (d *postgresSource) ReadAll(ctx context.Context, keyLength int) (map[[MaxKeyLength]string]string, error) {
+func (d *rdbSource) ReadAll(ctx context.Context, keyLength int) (map[[MaxKeyLength]string]string, error) {
 	if d.tableName == "" {
 		return nil, errors.New("table name is empty")
 	}

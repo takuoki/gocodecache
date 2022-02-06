@@ -2,9 +2,11 @@ package gocodecache_test
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
 
+	_ "github.com/lib/pq"
 	cache "github.com/takuoki/gocodecache"
 )
 
@@ -57,18 +59,22 @@ func ExampleCache() {
 	// Public
 }
 
-func ExamplePostgresSource() {
+func ExampleRdbSource() {
 	ctx := context.Background()
 
 	// -- How to initialize --
 
-	db, err := cache.ConnectPostgres(
-		"localhost",
-		"5432",
-		"root",
-		"root",
+	db, err := sql.Open(
 		"postgres",
-		"disable",
+		fmt.Sprintf(
+			"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+			"localhost",
+			"5432",
+			"root",
+			"root",
+			"postgres",
+			"disable",
+		),
 	)
 	if err != nil {
 		// handle error
@@ -85,7 +91,7 @@ func ExamplePostgresSource() {
 		time.Sleep(dbPingRetryInterval)
 	}
 
-	c, err := cache.New(ctx, cache.PostgresSource(db, "codes", [cache.MaxKeyLength]string{"key1", "key2"}, "value"), 2)
+	c, err := cache.New(ctx, cache.RdbSource(db, "codes", [cache.MaxKeyLength]string{"key1", "key2"}, "value"), 2)
 	if err != nil {
 		// handle error
 	}

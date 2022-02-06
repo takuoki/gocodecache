@@ -9,7 +9,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./sample/postgres.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./sample/rdb.sql:/docker-entrypoint-initdb.d/init.sql
     hostname: postgres
     restart: always
     user: root

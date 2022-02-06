@@ -2,9 +2,12 @@ package gocodecache_test
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"testing"
 	"time"
 
+	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	cache "github.com/takuoki/gocodecache"
 )
@@ -38,16 +41,20 @@ func TestPostgres(t *testing.T) {
 		},
 	}
 
-	db, err := cache.ConnectPostgres(
-		"localhost",
-		"5432",
-		"root",
-		"root",
+	db, err := sql.Open(
 		"postgres",
-		"disable",
+		fmt.Sprintf(
+			"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+			"localhost",
+			"5432",
+			"root",
+			"root",
+			"postgres",
+			"disable",
+		),
 	)
 	if err != nil {
-		t.Fatalf("failed to connect database: %v", err)
+		t.Fatalf("failed to open database: %v", err)
 	}
 	defer db.Close()
 
@@ -65,7 +72,7 @@ func TestPostgres(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			c, err := cache.New(ctx, cache.PostgresSource(db, tc.tableName, tc.keyColumnNames, tc.valueColumnName), tc.keyLength)
+			c, err := cache.New(ctx, cache.RdbSource(db, tc.tableName, tc.keyColumnNames, tc.valueColumnName), tc.keyLength)
 			if err != nil {
 				t.Fatalf("failed to create new cache: %v", err)
 			}

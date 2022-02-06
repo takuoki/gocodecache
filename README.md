@@ -92,10 +92,12 @@ CODES:
     2: Public
 ```
 
-### PostgreSQL
+### Relational database
+
+!!! **WARNING** !!! Tested only with PostgreSQL.
 
 ```go
-datasource := cache.PostgresSource(db, "codes", [cache.MaxKeyLength]string{"key1", "key2"}, "value")
+datasource := cache.RdbSource(db, "codes", [cache.MaxKeyLength]string{"key1", "key2"}, "value")
 ```
 
 table: codes
