@@ -17,10 +17,8 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/takuoki/gocodecache v0.0.0-20220206033328-6f66d48c2b2b h1:JB7XtD4S0lHeESL38xrTINMFsB6budAr+vkdigk5lg8=
-github.com/takuoki/gocodecache v0.0.0-20220206033328-6f66d48c2b2b/go.mod h1:dYsgjPXXktzk8q+ZlhgSigE9tzv1OkJIc4Rvi+EZv8o=
-github.com/takuoki/gocodecache v0.0.0-20220206034910-08a049ce9477 h1:fGJomo6L80Elid8K0C/y+be1A59JeWHnWj8+0awhduE=
-github.com/takuoki/gocodecache v0.0.0-20220206034910-08a049ce9477/go.mod h1:dYsgjPXXktzk8q+ZlhgSigE9tzv1OkJIc4Rvi+EZv8o=
+github.com/takuoki/gocodecache v0.2.0 h1:ICx7AhbXFFaJL35rSlGqCsMZvsvoy33hVWd+EP34YUs=
+github.com/takuoki/gocodecache v0.2.0/go.mod h1:dYsgjPXXktzk8q+ZlhgSigE9tzv1OkJIc4Rvi+EZv8o=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/valyala/fasttemplate v1.2.1 h1:TVEnxayobAdVkhQfrfes2IzOB6o+z4roRkPF52WA1u4=
