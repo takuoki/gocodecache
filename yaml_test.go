@@ -27,7 +27,7 @@ func TestYAML(t *testing.T) {
 		keyLength int
 		firstKeys map[string]struct{}
 		yaml      string
-		want      map[[cache.MaxKeyLength]string]string
+		want      cache.Codes
 		wantErr   string
 	}{
 		"success: key length == 2": {
@@ -83,7 +83,7 @@ CODES:
     1: Private
     2: Public
 `,
-			want: map[[cache.MaxKeyLength]string]string{
+			want: cache.Codes{
 				{"account_type", "1"}: "Anonymous account",
 				{"account_type", "2"}: "General account",
 				{"account_type", "3"}: "Administrator account",

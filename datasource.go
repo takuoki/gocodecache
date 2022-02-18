@@ -7,19 +7,19 @@ import (
 )
 
 type Datasource interface {
-	ReadAll(ctx context.Context, keyLength int) (map[[MaxKeyLength]string]string, error)
-	ReadFirstKeys(ctx context.Context, keyLength int, firstKeys map[string]struct{}) (map[[MaxKeyLength]string]string, error)
+	ReadAll(ctx context.Context, keyLength int) (Codes, error)
+	ReadFirstKeys(ctx context.Context, keyLength int, firstKeys map[string]struct{}) (Codes, error)
 }
 
-func convert(m map[interface{}]interface{}, keyLength int, firstKeys map[string]struct{}) (map[[MaxKeyLength]string]string, error) {
-	result := map[[MaxKeyLength]string]string{}
+func convert(m map[interface{}]interface{}, keyLength int, firstKeys map[string]struct{}) (Codes, error) {
+	result := Codes{}
 	if err := convertKeys(m, keyLength, 0, nil, firstKeys, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
-func convertKeys(m map[interface{}]interface{}, max, index int, keys []string, firstKeys map[string]struct{}, result map[[MaxKeyLength]string]string) error {
+func convertKeys(m map[interface{}]interface{}, max, index int, keys []string, firstKeys map[string]struct{}, result Codes) error {
 	if index < max-1 {
 		for k, v := range m {
 			key := fmt.Sprint(k)

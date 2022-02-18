@@ -91,7 +91,7 @@ func ExampleRdbSource() {
 		time.Sleep(dbPingRetryInterval)
 	}
 
-	c, err := cache.New(ctx, cache.RdbSource(db, "codes", [cache.MaxKeyLength]string{"key1", "key2"}, "value"), 2)
+	c, err := cache.New(ctx, cache.RdbSource(db, "codes", []string{"key1", "key2"}, "value"), 2)
 	if err != nil {
 		// handle error
 	}

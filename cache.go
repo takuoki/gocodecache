@@ -9,6 +9,9 @@ import (
 
 const MaxKeyLength = 5
 
+type Codes map[[MaxKeyLength]string]string
+type CodeLists map[[MaxKeyLength - 1]string][]string
+
 var (
 	ErrNotInitialized = errors.New("cache is not initialized")
 	ErrCodeNotFound   = errors.New("code not found")
@@ -16,7 +19,7 @@ var (
 
 type Cache struct {
 	mu        sync.RWMutex
-	codes     map[[MaxKeyLength]string]string
+	codes     Codes
 	ds        Datasource
 	keyLength int
 	opts      initializeOptions
@@ -97,7 +100,7 @@ func (c *Cache) load(ctx context.Context) error {
 	return nil
 }
 
-func (c *Cache) setCodes(ctx context.Context, codes map[[MaxKeyLength]string]string) {
+func (c *Cache) setCodes(ctx context.Context, codes Codes) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 

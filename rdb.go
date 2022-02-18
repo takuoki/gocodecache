@@ -11,12 +11,12 @@ import (
 type rdbSource struct {
 	db              *sql.DB
 	tableName       string
-	keyColumnNames  [MaxKeyLength]string
+	keyColumnNames  []string
 	valueColumnName string
 }
 
 func RdbSource(db *sql.DB, tableName string,
-	keyColumnNames [MaxKeyLength]string, valueColumnName string,
+	keyColumnNames []string, valueColumnName string,
 ) Datasource {
 	return &rdbSource{
 		db:              db,
@@ -26,31 +26,28 @@ func RdbSource(db *sql.DB, tableName string,
 	}
 }
 
-func (d *rdbSource) ReadAll(ctx context.Context, keyLength int) (map[[MaxKeyLength]string]string, error) {
+func (d *rdbSource) ReadAll(ctx context.Context, keyLength int) (Codes, error) {
 	return d.ReadFirstKeys(ctx, keyLength, nil)
 }
 
 func (d *rdbSource) ReadFirstKeys(ctx context.Context,
-	keyLength int, firstKeys map[string]struct{}) (map[[MaxKeyLength]string]string, error) {
+	keyLength int, firstKeys map[string]struct{}) (Codes, error) {
 	return d.read(ctx, keyLength, firstKeys)
 }
 
 func (d *rdbSource) read(ctx context.Context,
-	keyLength int, firstKeys map[string]struct{}) (map[[MaxKeyLength]string]string, error) {
+	keyLength int, firstKeys map[string]struct{}) (Codes, error) {
 
 	if d.tableName == "" {
 		return nil, errors.New("table name is empty")
+	}
+	if len(d.keyColumnNames) != keyLength {
+		return nil, errors.New("length of keyColumnNames doesn't match keyLength")
 	}
 
 	firstKey := ""
 	keys := []string{}
 	for i, k := range d.keyColumnNames {
-		if keyLength <= i {
-			if k != "" {
-				return nil, fmt.Errorf("key column name is not empty (index = %d)", i)
-			}
-			continue
-		}
 		if k == "" {
 			return nil, fmt.Errorf("key column name is empty (index = %d)", i)
 		}
@@ -83,7 +80,7 @@ func (d *rdbSource) read(ctx context.Context,
 	}
 	defer rows.Close()
 
-	m := map[[MaxKeyLength]string]string{}
+	m := Codes{}
 	dataPtr := make([]interface{}, keyLength+1)
 	for rows.Next() {
 		data := make([]string, keyLength+1)
