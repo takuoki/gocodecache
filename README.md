@@ -53,7 +53,7 @@ func main() {
     // handle error
   }
 
-  vLevel := cache.MustGetValue(ctx, "visibility_level", "2")
+  vLevel2Str := cache.MustGetValue(ctx, "visibility_level", "2")
 }
 ```
 
@@ -112,35 +112,44 @@ table: codes
 
 ## Tips
 
-### Internationalization (I18n)
+### Partial loading
 
-I18n can be supported by adding language codes to the keys.
+By specifying first keys, you can load a part of the code master.
 
-```yaml
-# ./sample/codes_lang.yaml
-VERSION: 0.1.0
+```go
+package main
 
-CODES:
-  account_type:
-    1:
-      en-US: Anonymous account
-      ja-JP: 匿名アカウント
-    2:
-      en-US: General account
-      ja-JP: 一般アカウント
-    3:
-      en-US: Administrator account
-      ja-JP: 管理者アカウント
-  visibility_level:
-    1:
-      en-US: Private
-      ja-JP: 非公開
-    2:
-      en-US: Public
-      ja-JP: 公開
+import (
+  "context"
+
+  cache "github.com/takuoki/gocodecache"
+)
+
+func main() {
+  ctx := context.Background()
+
+  // ...
+
+  c, err := cache.New(ctx, datasource, 2, cache.WithLoadFirstKeys("account_type"))
+  if err != nil {
+    // handle error
+  }
+
+  // found
+  accType1Str, err := c.GetValue(ctx, "account_type", "1")
+  if err != nil {
+    // handle error
+  }
+
+  // not found
+  vLevel2Str, err := c.GetValue(ctx, "visibility_level", "2")
+  if err != nil {
+    // handle error
+  }
+}
 ```
 
-### Automatic reload
+### Automatic reloading
 
 By implementing the reloading process in goroutine, automatic reloading can be achieved. ([sample](sample/main.go))
 
@@ -184,4 +193,32 @@ func reload(ctx context.Context, c *cache.Cache) {
     }
   }
 }
+```
+
+### Internationalization (I18n)
+
+I18n can be supported by adding language codes to the keys.
+
+```yaml
+# ./sample/codes_lang.yaml
+VERSION: 0.1.0
+
+CODES:
+  account_type:
+    1:
+      en-US: Anonymous account
+      ja-JP: 匿名アカウント
+    2:
+      en-US: General account
+      ja-JP: 一般アカウント
+    3:
+      en-US: Administrator account
+      ja-JP: 管理者アカウント
+  visibility_level:
+    1:
+      en-US: Private
+      ja-JP: 非公開
+    2:
+      en-US: Public
+      ja-JP: 公開
 ```
