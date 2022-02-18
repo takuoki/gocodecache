@@ -8,22 +8,29 @@ import (
 
 type Datasource interface {
 	ReadAll(ctx context.Context, keyLength int) (map[[MaxKeyLength]string]string, error)
+	ReadFirstKeys(ctx context.Context, keyLength int, firstKeys map[string]struct{}) (map[[MaxKeyLength]string]string, error)
 }
 
-func convert(m map[interface{}]interface{}, keyLength int) (map[[MaxKeyLength]string]string, error) {
+func convert(m map[interface{}]interface{}, keyLength int, firstKeys map[string]struct{}) (map[[MaxKeyLength]string]string, error) {
 	result := map[[MaxKeyLength]string]string{}
-	if err := convertKeys(m, keyLength, 0, nil, result); err != nil {
+	if err := convertKeys(m, keyLength, 0, nil, firstKeys, result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
-func convertKeys(m map[interface{}]interface{}, max, index int, keys []string, result map[[MaxKeyLength]string]string) error {
+func convertKeys(m map[interface{}]interface{}, max, index int, keys []string, firstKeys map[string]struct{}, result map[[MaxKeyLength]string]string) error {
 	if index < max-1 {
 		for k, v := range m {
-			keys := append(keys, fmt.Sprint(k))
+			key := fmt.Sprint(k)
+			if index == 0 && firstKeys != nil {
+				if _, ok := firstKeys[key]; !ok {
+					continue
+				}
+			}
+			keys := append(keys, key)
 			if v2, ok := v.(map[interface{}]interface{}); ok {
-				if err := convertKeys(v2, max, index+1, keys, result); err != nil {
+				if err := convertKeys(v2, max, index+1, keys, firstKeys, result); err != nil {
 					return err
 				}
 			} else {

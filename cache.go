@@ -19,12 +19,13 @@ type Cache struct {
 	codes     map[[MaxKeyLength]string]string
 	ds        Datasource
 	keyLength int
+	opts      initializeOptions
 }
 
 var defaultCache *Cache
 
-func InitializeGlobalCache(ctx context.Context, ds Datasource, keyLength int) error {
-	c, err := New(ctx, ds, keyLength)
+func InitializeGlobalCache(ctx context.Context, ds Datasource, keyLength int, opts ...InitializeOption) error {
+	c, err := New(ctx, ds, keyLength, opts...)
 	if err != nil {
 		return err
 	}
@@ -55,7 +56,7 @@ func MustGetValue(ctx context.Context, keys ...string) string {
 	return defaultCache.MustGetValue(ctx, keys...)
 }
 
-func New(ctx context.Context, ds Datasource, keyLength int) (*Cache, error) {
+func New(ctx context.Context, ds Datasource, keyLength int, opts ...InitializeOption) (*Cache, error) {
 	if ds == nil {
 		return nil, errors.New("datasource is nil")
 	}
@@ -66,7 +67,12 @@ func New(ctx context.Context, ds Datasource, keyLength int) (*Cache, error) {
 	c := &Cache{
 		ds:        ds,
 		keyLength: keyLength,
+		opts:      defaultInitializeOptions(),
 	}
+	for _, opt := range opts {
+		opt.apply(&c.opts)
+	}
+
 	if err := c.load(ctx); err != nil {
 		return nil, err
 	}
@@ -74,17 +80,28 @@ func New(ctx context.Context, ds Datasource, keyLength int) (*Cache, error) {
 }
 
 func (c *Cache) load(ctx context.Context) error {
-	m, err := c.ds.ReadAll(ctx, c.keyLength)
-	if err != nil {
-		return fmt.Errorf("failed to read from datasource: %w", err)
+	if c.opts.loadFirstKeys == nil {
+		m, err := c.ds.ReadAll(ctx, c.keyLength)
+		if err != nil {
+			return fmt.Errorf("failed to read all from datasource: %w", err)
+		}
+		c.setCodes(ctx, m)
+	} else {
+		m, err := c.ds.ReadFirstKeys(ctx, c.keyLength, c.opts.loadFirstKeys)
+		if err != nil {
+			return fmt.Errorf("failed to read first keys from datasource: %w", err)
+		}
+		c.setCodes(ctx, m)
 	}
 
+	return nil
+}
+
+func (c *Cache) setCodes(ctx context.Context, codes map[[MaxKeyLength]string]string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	c.codes = m
-
-	return nil
+	c.codes = codes
 }
 
 func (c *Cache) Reload(ctx context.Context) error {

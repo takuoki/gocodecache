@@ -20,6 +20,7 @@ const (
 func TestPostgres(t *testing.T) {
 	testcases := map[string]struct {
 		keyLength       int
+		firstKeys       []string
 		tableName       string
 		keyColumnNames  [cache.MaxKeyLength]string
 		valueColumnName string
@@ -38,6 +39,26 @@ func TestPostgres(t *testing.T) {
 			keyColumnNames:  [cache.MaxKeyLength]string{"key1", "key2", "lang"},
 			valueColumnName: "value",
 			want:            dataLang,
+		},
+		"success: len(firstKeys) == 1": {
+			keyLength:       2,
+			firstKeys:       []string{"account_type"},
+			tableName:       "codes",
+			keyColumnNames:  [cache.MaxKeyLength]string{"key1", "key2"},
+			valueColumnName: "value",
+			want: map[[cache.MaxKeyLength]string]string{
+				{"account_type", "1"}: "Anonymous account",
+				{"account_type", "2"}: "General account",
+				{"account_type", "3"}: "Administrator account",
+			},
+		},
+		"success: len(firstKeys) == 2": {
+			keyLength:       2,
+			firstKeys:       []string{"account_type", "visibility_level"},
+			tableName:       "codes",
+			keyColumnNames:  [cache.MaxKeyLength]string{"key1", "key2"},
+			valueColumnName: "value",
+			want:            data,
 		},
 	}
 
@@ -72,7 +93,8 @@ func TestPostgres(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 
-			c, err := cache.New(ctx, cache.RdbSource(db, tc.tableName, tc.keyColumnNames, tc.valueColumnName), tc.keyLength)
+			c, err := cache.New(ctx, cache.RdbSource(db, tc.tableName, tc.keyColumnNames, tc.valueColumnName),
+				tc.keyLength, cache.WithLoadFirstKeys(tc.firstKeys...))
 			if err != nil {
 				t.Fatalf("failed to create new cache: %v", err)
 			}

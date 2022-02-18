@@ -27,20 +27,35 @@ func RdbSource(db *sql.DB, tableName string,
 }
 
 func (d *rdbSource) ReadAll(ctx context.Context, keyLength int) (map[[MaxKeyLength]string]string, error) {
+	return d.ReadFirstKeys(ctx, keyLength, nil)
+}
+
+func (d *rdbSource) ReadFirstKeys(ctx context.Context,
+	keyLength int, firstKeys map[string]struct{}) (map[[MaxKeyLength]string]string, error) {
+	return d.read(ctx, keyLength, firstKeys)
+}
+
+func (d *rdbSource) read(ctx context.Context,
+	keyLength int, firstKeys map[string]struct{}) (map[[MaxKeyLength]string]string, error) {
+
 	if d.tableName == "" {
 		return nil, errors.New("table name is empty")
 	}
 
+	firstKey := ""
 	keys := []string{}
 	for i, k := range d.keyColumnNames {
 		if keyLength <= i {
 			if k != "" {
 				return nil, fmt.Errorf("key column name is not empty (index = %d)", i)
 			}
-			break
+			continue
 		}
 		if k == "" {
 			return nil, fmt.Errorf("key column name is empty (index = %d)", i)
+		}
+		if i == 0 {
+			firstKey = k
 		}
 		keys = append(keys, k)
 	}
@@ -50,8 +65,19 @@ func (d *rdbSource) ReadAll(ctx context.Context, keyLength int) (map[[MaxKeyLeng
 	}
 
 	query := fmt.Sprintf("SELECT %s, %s FROM %s", strings.Join(keys, ", "), d.valueColumnName, d.tableName)
+	firstKeyList := []interface{}{}
+	if firstKeys != nil {
+		ps := []string{}
+		i := 0
+		for k := range firstKeys {
+			i++
+			firstKeyList = append(firstKeyList, k)
+			ps = append(ps, fmt.Sprintf("$%d", i))
+		}
+		query += fmt.Sprintf(" WHERE %s IN (%s)", firstKey, strings.Join(ps, ", "))
+	}
 
-	rows, err := d.db.QueryContext(ctx, query)
+	rows, err := d.db.QueryContext(ctx, query, firstKeyList...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read from database: %w", err)
 	}

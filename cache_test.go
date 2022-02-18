@@ -36,21 +36,35 @@ func TestCache(t *testing.T) {
 
 	ctx := context.Background()
 
-	c, err := cache.New(ctx, cache.RawSource(data), 2)
-	if err != nil {
+	// all keys
+	if c, err := cache.New(ctx, cache.RawSource(data), 2); err != nil {
 		t.Fatalf("failed to create new cache: %v", err)
+	} else {
+		r1, err := c.GetValue(ctx, "account_type", "1")
+		assert.Nil(t, err, "error must be nil")
+		assert.Equal(t, "Anonymous account", r1)
+
+		r2 := c.MustGetValue(ctx, "visibility_level", "2")
+		assert.Equal(t, "Public", r2)
+
+		_, err = c.GetValue(ctx, "visibility_level", "3")
+		if assert.NotNil(t, err, "error must not be nil") {
+			assert.Equal(t, cache.ErrCodeNotFound, err)
+		}
 	}
 
-	r1, err := c.GetValue(ctx, "account_type", "1")
-	assert.Nil(t, err, "error must be nil")
-	assert.Equal(t, "Anonymous account", r1)
+	// partial key
+	if c, err := cache.New(ctx, cache.RawSource(data), 2, cache.WithLoadFirstKeys("account_type")); err != nil {
+		t.Fatalf("failed to create new cache: %v", err)
+	} else {
+		r1, err := c.GetValue(ctx, "account_type", "1")
+		assert.Nil(t, err, "error must be nil")
+		assert.Equal(t, "Anonymous account", r1)
 
-	r2 := c.MustGetValue(ctx, "visibility_level", "2")
-	assert.Equal(t, "Public", r2)
-
-	_, err = c.GetValue(ctx, "visibility_level", "3")
-	if assert.NotNil(t, err, "error must not be nil") {
-		assert.Equal(t, cache.ErrCodeNotFound, err)
+		_, err = c.GetValue(ctx, "visibility_level", "2")
+		if assert.NotNil(t, err, "error must not be nil") {
+			assert.Equal(t, cache.ErrCodeNotFound, err)
+		}
 	}
 }
 

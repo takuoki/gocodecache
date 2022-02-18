@@ -25,6 +25,7 @@ func TestYAML(t *testing.T) {
 
 	testcases := map[string]struct {
 		keyLength int
+		firstKeys map[string]struct{}
 		yaml      string
 		want      map[[cache.MaxKeyLength]string]string
 		wantErr   string
@@ -66,6 +67,27 @@ CODES:
       ja-JP: 公開
 `,
 			want: dataLang,
+		},
+		"success: firstKeys != nil": {
+			keyLength: 2,
+			firstKeys: map[string]struct{}{
+				"account_type": {},
+			},
+			yaml: `
+CODES:
+  account_type:
+    1: Anonymous account
+    2: General account
+    3: Administrator account
+  visibility_level:
+    1: Private
+    2: Public
+`,
+			want: map[[cache.MaxKeyLength]string]string{
+				{"account_type", "1"}: "Anonymous account",
+				{"account_type", "2"}: "General account",
+				{"account_type", "3"}: "Administrator account",
+			},
 		},
 		"failure: invalid yaml": {
 			keyLength: 1,
@@ -115,7 +137,7 @@ CODES:
 	for name, tc := range testcases {
 		t.Run(name, func(t *testing.T) {
 			buf := bytes.NewBufferString(tc.yaml)
-			r, err := cache.ReadAllForYAML(ctx, "CODES", tc.keyLength, buf)
+			r, err := cache.ReadForYAML(ctx, "CODES", tc.keyLength, tc.firstKeys, buf)
 
 			if tc.wantErr == "" {
 				if assert.Nil(t, err, "error must be nil") {

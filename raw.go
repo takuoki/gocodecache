@@ -15,3 +15,14 @@ func RawSource(data map[[MaxKeyLength]string]string) Datasource {
 func (d *rawSource) ReadAll(ctx context.Context, keyLength int) (map[[MaxKeyLength]string]string, error) {
 	return d.data, nil
 }
+
+func (d *rawSource) ReadFirstKeys(ctx context.Context, keyLength int, firstKeys map[string]struct{}) (map[[MaxKeyLength]string]string, error) {
+	data := map[[MaxKeyLength]string]string{}
+	for k, v := range d.data {
+		if _, ok := firstKeys[k[0]]; !ok {
+			continue
+		}
+		data[k] = v
+	}
+	return data, nil
+}
