@@ -64,7 +64,7 @@ func main() {
 Define a datasource as Golang code.
 
 ```go
-datasource := cache.RawSource(map[[cache.MaxKeyLength]string]string{
+datasource := cache.RawSource(cache.Codes{
   {"account_type", "1"}:     "Anonymous account",
   {"account_type", "2"}:     "General account",
   {"account_type", "3"}:     "Administrator account",
@@ -97,7 +97,7 @@ CODES:
 !!! **WARNING** !!! Tested only with PostgreSQL.
 
 ```go
-datasource := cache.RdbSource(db, "codes", [cache.MaxKeyLength]string{"key1", "key2"}, "value")
+datasource := cache.RdbSource(db, "codes", []string{"key1", "key2"}, "value")
 ```
 
 table: codes

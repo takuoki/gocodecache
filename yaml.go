@@ -21,11 +21,11 @@ func YAMLSource(filepath, rootKey string) Datasource {
 	}
 }
 
-func (d *yamlSource) ReadAll(ctx context.Context, keyLength int) (map[[MaxKeyLength]string]string, error) {
+func (d *yamlSource) ReadAll(ctx context.Context, keyLength int) (Codes, error) {
 	return d.ReadFirstKeys(ctx, keyLength, nil)
 }
 
-func (d *yamlSource) ReadFirstKeys(ctx context.Context, keyLength int, firstKeys map[string]struct{}) (map[[MaxKeyLength]string]string, error) {
+func (d *yamlSource) ReadFirstKeys(ctx context.Context, keyLength int, firstKeys map[string]struct{}) (Codes, error) {
 	f, err := os.Open(d.filepath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file: %w", err)
@@ -34,7 +34,7 @@ func (d *yamlSource) ReadFirstKeys(ctx context.Context, keyLength int, firstKeys
 	return d.read(ctx, keyLength, firstKeys, f)
 }
 
-func (d *yamlSource) read(ctx context.Context, keyLength int, firstKeys map[string]struct{}, r io.Reader) (map[[MaxKeyLength]string]string, error) {
+func (d *yamlSource) read(ctx context.Context, keyLength int, firstKeys map[string]struct{}, r io.Reader) (Codes, error) {
 	var m map[string]interface{}
 	if err := yaml.NewDecoder(r).Decode(&m); err != nil {
 		return nil, fmt.Errorf("failed to decode file: %w", err)

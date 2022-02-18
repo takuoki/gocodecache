@@ -5,19 +5,19 @@ import (
 )
 
 type rawSource struct {
-	data map[[MaxKeyLength]string]string
+	data Codes
 }
 
-func RawSource(data map[[MaxKeyLength]string]string) Datasource {
+func RawSource(data Codes) Datasource {
 	return &rawSource{data: data}
 }
 
-func (d *rawSource) ReadAll(ctx context.Context, keyLength int) (map[[MaxKeyLength]string]string, error) {
+func (d *rawSource) ReadAll(ctx context.Context, keyLength int) (Codes, error) {
 	return d.data, nil
 }
 
-func (d *rawSource) ReadFirstKeys(ctx context.Context, keyLength int, firstKeys map[string]struct{}) (map[[MaxKeyLength]string]string, error) {
-	data := map[[MaxKeyLength]string]string{}
+func (d *rawSource) ReadFirstKeys(ctx context.Context, keyLength int, firstKeys map[string]struct{}) (Codes, error) {
+	data := Codes{}
 	for k, v := range d.data {
 		if _, ok := firstKeys[k[0]]; !ok {
 			continue

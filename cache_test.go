@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	data = map[[cache.MaxKeyLength]string]string{
+	data = cache.Codes{
 		{"account_type", "1"}:     "Anonymous account",
 		{"account_type", "2"}:     "General account",
 		{"account_type", "3"}:     "Administrator account",
@@ -18,7 +18,7 @@ var (
 		{"visibility_level", "2"}: "Public",
 	}
 
-	dataLang = map[[cache.MaxKeyLength]string]string{
+	dataLang = cache.Codes{
 		{"account_type", "1", "en-US"}:     "Anonymous account",
 		{"account_type", "1", "ja-JP"}:     "匿名アカウント",
 		{"account_type", "2", "en-US"}:     "General account",
